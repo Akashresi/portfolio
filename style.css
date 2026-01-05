@@ -1,4 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&family=Poppins:wght@100;200;300;400;500;600&display=swap');
+
+:root {
+    /* Primary Color Palette: Deep Navy & Gold */
+    --bg-gradient: linear-gradient(45deg, #0a192f, #112240, #0a192f);
+    --text-primary: #e6f1ff;
+    --text-muted: #8892b0;
+    --accent-color: #FFD700;
+    /* Gold */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 215, 0, 0.1);
+    /* Gold tint on border */
+
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+[data-theme="light"] {
+    --bg-gradient: linear-gradient(45deg, #f0f4f8, #d9e2ec, #bcccdc);
+    --text-primary: #102a43;
+    --text-muted: #486581;
+    --accent-color: #004d40;
+    /* Deep Emerald/Teal for light mode readability */
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(0, 0, 0, 0.1);
+}
 
 * {
     margin: 0;
@@ -7,7 +33,14 @@
     text-decoration: none;
     border: none;
     outline: none;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+.logo {
+    font-family: var(--font-heading);
 }
 
 html {
@@ -21,15 +54,34 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     /* Dark Gradient Background to make Glass Effect pop */
-    background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
-    color: white;
+    /* Use the variable gradient */
+    background: var(--bg-gradient);
+    color: var(--text-primary);
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* Animation Class */
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Background decorations for Glassmorphism */
 .circle {
     position: fixed;
     border-radius: 50%;
-    background: #b74b4b;
+    background: var(--accent-color);
     filter: blur(100px);
     z-index: -1;
     animation: float 10s infinite ease-in-out;
@@ -51,8 +103,15 @@ body {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
 /* HEADER GLASS STYLE */
@@ -75,11 +134,11 @@ header {
 
 .logo {
     font-size: 3rem;
-    color: #b74b4b;
+    color: var(--accent-color);
     font-weight: 800;
     cursor: pointer;
     transition: 0.5s ease;
-    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .logo:hover {
@@ -97,8 +156,8 @@ nav a {
 
 nav a:hover,
 nav a.active {
-    color: #b74b4b;
-    border-bottom: 3px solid #b74b4b;
+    color: var(--accent-color);
+    border-bottom: 3px solid var(--accent-color);
     text-shadow: 0 0 10px rgba(183, 75, 75, 0.5);
 }
 
@@ -119,7 +178,7 @@ section {
 }
 
 span {
-    color: #b74b4b;
+    color: var(--accent-color);
 }
 
 /* Glass Card Utility Class - Used for containers */
@@ -136,7 +195,7 @@ span {
 /* HOME SECTION */
 .home {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 8rem;
@@ -166,14 +225,14 @@ span {
 .home-img img {
     width: 30vw;
     border-radius: 50%;
-    box-shadow: 0 0 25px #b74b4b;
+    box-shadow: 0 0 25px var(--accent-color);
     cursor: pointer;
     transition: 0.4s ease-in-out;
     border: 5px solid rgba(255, 255, 255, 0.1);
 }
 
 .home-img img:hover {
-    box-shadow: 0 0 50px #b74b4b, 0 0 100px #b74b4b;
+    box-shadow: 0 0 50px var(--accent-color), 0 0 100px var(--accent-color);
 }
 
 /* Social Icons */
@@ -184,32 +243,32 @@ span {
     width: 4rem;
     height: 4rem;
     background-color: transparent;
-    border: 0.2rem solid #b74b4b;
+    border: 0.2rem solid var(--accent-color);
     font-size: 2rem;
     border-radius: 50%;
     margin: 3rem 1.5rem 3rem 0;
     transition: 0.3s ease;
-    color: #b74b4b;
+    color: var(--accent-color);
 }
 
 .social-icons a:hover {
     color: black;
     transform: scale(1.3) translateY(-5px);
-    background-color: #b74b4b;
-    box-shadow: 0 0 25px #b74b4b;
+    background-color: var(--accent-color);
+    box-shadow: 0 0 25px var(--accent-color);
 }
 
 /* Button Style */
 .btn {
     display: inline-block;
     padding: 1rem 2.8rem;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     border-radius: 4rem;
     font-size: 1.6rem;
-    color: #b74b4b;
+    color: var(--accent-color);
     letter-spacing: 0.1rem;
     font-weight: 600;
-    border: 2px solid #b74b4b;
+    border: 2px solid var(--accent-color);
     transition: 0.3s ease;
     cursor: pointer;
     backdrop-filter: blur(5px);
@@ -217,9 +276,9 @@ span {
 
 .btn:hover {
     transform: scale(1.03);
-    background-color: #b74b4b;
+    background-color: var(--accent-color);
     color: white;
-    box-shadow: 0 0 25px #b74b4b;
+    box-shadow: 0 0 25px var(--accent-color);
 }
 
 /* SERVICES SECTION */
@@ -241,12 +300,12 @@ span {
 .service-box:hover {
     transform: translateY(-10px);
     background: rgba(255, 255, 255, 0.1);
-    border-color: #b74b4b;
+    border-color: var(--accent-color);
 }
 
 .service-box i {
     font-size: 5rem;
-    color: #b74b4b;
+    color: var(--accent-color);
     margin-bottom: 1rem;
 }
 
@@ -263,22 +322,24 @@ span {
 
 .skills {
     /* Use full viewport height */
-    height: 100vh; 
+    height: 100vh;
     /* Remove padding so flexbox can center perfectly */
-    padding: 0; 
+    padding: 0;
     width: 100%;
     overflow: hidden;
-    
+
     /* Flexbox centering magic */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centers vertical (Top to Bottom) */
-    align-items: center;     /* Centers horizontal (Left to Right) */
+    justify-content: center;
+    /* Centers vertical (Top to Bottom) */
+    align-items: center;
+    /* Centers horizontal (Left to Right) */
 }
 
 .skills .heading {
     /* Push the heading up slightly so icons have the true center */
-    margin-bottom: 8rem; 
+    margin-bottom: 8rem;
     font-size: 6rem;
 }
 
@@ -289,21 +350,25 @@ span {
     display: flex;
     overflow: hidden;
     background: transparent;
-    padding: 2rem 0; /* Minimal padding to keep it tight */
+    padding: 2rem 0;
+    /* Minimal padding to keep it tight */
 }
 
 .logos-slide {
     display: inline-flex;
-    align-items: center; /* Align icons vertically in the row */
+    align-items: center;
+    /* Align icons vertically in the row */
     animation: slide 25s infinite linear;
 }
 
 .logos-slide i {
     /* --- SIZE ADJUSTMENT HERE --- */
-    font-size: 12rem;  /* Very Large Icons */
-    margin: 0 8rem;    /* Wide spacing between icons */
+    font-size: 12rem;
+    /* Very Large Icons */
+    margin: 0 8rem;
+    /* Wide spacing between icons */
     /* ---------------------------- */
-    
+
     color: rgba(255, 255, 255, 0.6);
     transition: 0.3s ease;
     cursor: pointer;
@@ -311,9 +376,10 @@ span {
 
 /* Hover Effect */
 .logos-slide i:hover {
-    color: #b74b4b;
-    transform: scale(1.15); /* Slight pop */
-    filter: drop-shadow(0 0 25px #b74b4b);
+    color: var(--accent-color);
+    transform: scale(1.15);
+    /* Slight pop */
+    filter: drop-shadow(0 0 25px var(--accent-color));
     opacity: 1;
 }
 
@@ -321,6 +387,7 @@ span {
     from {
         transform: translateX(0);
     }
+
     to {
         transform: translateX(-100%);
     }
@@ -329,6 +396,7 @@ span {
 .skills-marquee:hover .logos-slide {
     animation-play-state: paused;
 }
+
 /* ------------------------------------------- */
 
 /* Ensure this is in your style.css (from the previous step) */
@@ -345,33 +413,39 @@ span {
 }
 
 .contact-info-box {
-    flex: 1 1 35rem; /* Slightly wider to fit horizontal content */
+    flex: 1 1 35rem;
+    /* Slightly wider to fit horizontal content */
     max-width: 450px;
-    
+
     /* HORIZONTAL ALIGNMENT SETTINGS */
     display: flex;
-    flex-direction: row; /* Icon Left, Text Right */
-    align-items: center; /* Vertically center icon */
-    justify-content: flex-start; /* Start from the left */
-    text-align: left; /* Align text to the left */
-    
+    flex-direction: row;
+    /* Icon Left, Text Right */
+    align-items: center;
+    /* Vertically center icon */
+    justify-content: flex-start;
+    /* Start from the left */
+    text-align: left;
+    /* Align text to the left */
+
     padding: 3rem;
-    gap: 2.5rem; /* Space between Icon and Text */
+    gap: 2.5rem;
+    /* Space between Icon and Text */
     transition: 0.4s ease;
 }
 
 .contact-info-box:hover {
     transform: translateY(-5px);
     background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 25px #b74b4b;
-    border-color: #b74b4b;
+    box-shadow: 0 0 25px var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .contact-info-box i {
     font-size: 4.5rem;
-    color: #b74b4b;
+    color: var(--accent-color);
     /* Removed margin-bottom since it's now horizontal */
-    margin-bottom: 0; 
+    margin-bottom: 0;
 }
 
 /* Wrapper for the text so it stays structured */
@@ -385,6 +459,7 @@ span {
     font-size: 1.6rem;
     color: rgba(255, 255, 255, 0.8);
 }
+
 /* FOOTER */
 .footer {
     display: flex;
@@ -392,7 +467,7 @@ span {
     align-items: center;
     flex-wrap: wrap;
     padding: 2rem 9%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
 }
 
@@ -406,36 +481,72 @@ span {
     font-weight: 600;
     min-width: 280px;
 }
-.typing-text span { position: relative; }
+
+.typing-text span {
+    position: relative;
+}
+
 .typing-text span::before {
     content: "Software Developer";
-    color: #b74b4b;
+    color: var(--accent-color);
     animation: words 20s infinite;
 }
+
 .typing-text span::after {
     content: "";
-    background-color: transparent; 
+    background-color: transparent;
     position: absolute;
     width: calc(100% + 8px);
     height: 100%;
-    border-left: 3px solid #b74b4b;
+    border-left: 3px solid var(--accent-color);
     right: -8;
     animation: cursor 0.6s infinite;
 }
-@keyframes cursor { to { border-left: 3px solid transparent; } }
+
+@keyframes cursor {
+    to {
+        border-left: 3px solid transparent;
+    }
+}
+
 @keyframes words {
-    0%, 20% { content: "Web Developer"; }
-    21%, 40% { content: "Developer"; }
-    41%, 60% { content: "Web Designer"; }
-    61%, 80% { content: "Youtuber"; }
-    81%, 100% { content: "Script Writer"; }
+
+    0%,
+    20% {
+        content: "Frontend Engineer";
+    }
+
+    21%,
+    40% {
+        content: "UI/UX Specialist";
+    }
+
+    41%,
+    60% {
+        content: "React Developer";
+    }
+
+    61%,
+    80% {
+        content: "Tech Lead";
+    }
+
+    81%,
+    100% {
+        content: "Performance Efficiency";
+    }
 }
 
 /* BREAKPOINTS */
 @media (max-width: 995px) {
-    header { padding: 2rem 3%; }
-    section { padding: 10rem 3% 2rem; }
-    
+    header {
+        padding: 2rem 3%;
+    }
+
+    section {
+        padding: 10rem 3% 2rem;
+    }
+
     .home {
         flex-direction: column;
         gap: 4rem;
@@ -445,7 +556,7 @@ span {
         width: 70vw;
         margin-top: 4rem;
     }
-    
+
     nav {
         position: absolute;
         top: 100%;
@@ -454,13 +565,15 @@ span {
         padding: 1rem 3%;
         background: rgba(0, 0, 0, 0.9);
         backdrop-filter: blur(20px);
-        border-top: 1px solid rgba(255,255,255,0.1);
-        display: none; 
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: none;
     }
 
     /* Note: JavaScript is needed to toggle this active class for mobile menu */
-    nav.active { display: block; }
-    
+    nav.active {
+        display: block;
+    }
+
     nav a {
         display: block;
         font-size: 2rem;
@@ -469,5 +582,7 @@ span {
 }
 
 @media (max-width: 617px) {
-    .contact form .input-box input { width: 100%; }
+    .contact form .input-box input {
+        width: 100%;
+    }
 }
