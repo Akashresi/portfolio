@@ -3,37 +3,10 @@
  * Features: Dark/Light Mode, GitHub API, Scroll Animations
  */
 
-// --- 1. Dark/Light Mode Toggle ---
-const toggleBtn = document.createElement('button');
-toggleBtn.innerText = '🌙';
-toggleBtn.className = 'theme-toggle btn';
-toggleBtn.style.position = 'fixed';
-toggleBtn.style.bottom = '20px';
-toggleBtn.style.right = '20px';
-toggleBtn.style.zIndex = '1000';
-toggleBtn.style.padding = '1rem';
-toggleBtn.style.borderRadius = '50%';
-toggleBtn.style.fontSize = '1.5rem';
-
-document.body.appendChild(toggleBtn);
-
-const toggleTheme = () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-
-    // Update Icon
-    toggleBtn.innerText = newTheme === 'light' ? '☀️' : '🌙';
-};
-
-toggleBtn.addEventListener('click', toggleTheme);
-
-// Initialize Theme
-const savedTheme = localStorage.getItem('theme') || 'dark';
-document.documentElement.setAttribute('data-theme', savedTheme);
-toggleBtn.innerText = savedTheme === 'light' ? '☀️' : '🌙';
+// --- 1. Theme Config (Strict Dark Mode) ---
+// The Antigravity theme is designed as a dark-only experience.
+document.documentElement.setAttribute('data-theme', 'dark');
+localStorage.setItem('theme', 'dark');
 
 
 // --- 2. GitHub API Integration ---
@@ -67,15 +40,15 @@ async function fetchGitHubProjects(username) {
 
         const grid = projectSection.querySelector('.projects-grid');
         grid.innerHTML = repos.map(repo => `
-            <div class="service-box glass-card" style="text-align: left;">
-                <i class="fa-brands fa-github" style="font-size: 3rem;"></i>
-                <h3 style="font-size: 2rem;">${repo.name}</h3>
-                <p>${repo.description || 'No description provided.'}</p>
-                <div style="margin-top: 1rem; color: var(--accent-color);">
+            <div class="service-box glass-card project-card">
+                <i class="fa-brands fa-github project-icon"></i>
+                <h3 class="repo-title">${repo.name}</h3>
+                <p class="repo-desc">${repo.description || 'No description provided.'}</p>
+                <div class="repo-stats">
                     <span>⭐ ${repo.stargazers_count}</span>
-                    <span style="margin-left: 10px;">🍴 ${repo.forks_count}</span>
+                    <span>🍴 ${repo.forks_count}</span>
                 </div>
-                <a href="${repo.html_url}" target="_blank" class="btn" style="margin-top: 1.5rem; padding: 0.5rem 1.5rem;">View Code</a>
+                <a href="${repo.html_url}" target="_blank" class="btn btn-small">View Code</a>
             </div>
         `).join('');
 
