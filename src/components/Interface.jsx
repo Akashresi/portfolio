@@ -1,255 +1,221 @@
-import { useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
-// --- Shared Components ---
+// --- Components ---
 
-const RevealText = ({ children, delay = 0 }) => {
-    return (
-        <motion.span
-            initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
-            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: 0.8, delay, ease: [0.2, 0.65, 0.3, 0.9] }}
-            viewport={{ once: true }}
-            style={{ display: 'inline-block' }}
-        >
-            {children}
-        </motion.span>
-    );
-};
+const FadeIn = ({ children, delay = 0 }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.6, delay, ease: "easeOut" }}
+    >
+        {children}
+    </motion.div>
+);
 
-const MagneticButton = ({ children, style, href }) => {
-    const ref = useRef(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
+const SectionDivider = () => (
+    <div style={{ width: '100%', height: '1px', background: 'var(--border-subtle)', margin: '6rem 0' }} />
+);
 
-    const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
-    const springX = useSpring(x, springConfig);
-    const springY = useSpring(y, springConfig);
-
-    const handleMouseMove = (e) => {
-        const { clientX, clientY } = e;
-        const { left, top, width, height } = ref.current.getBoundingClientRect();
-        const centerX = left + width / 2;
-        const centerY = top + height / 2;
-        x.set((clientX - centerX) * 0.3); // Magnetic pull strength
-        y.set((clientY - centerY) * 0.3);
-    };
-
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-    };
-
-    return (
-        <motion.a
-            ref={ref}
-            href={href}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{
-                ...style,
-                x: springX,
-                y: springY,
-                display: 'inline-block',
-                textDecoration: 'none',
-                cursor: 'none' // Handled by CustomCursor
-            }}
-            data-hover // Signal for cursor to grow
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-        >
-            {children}
-        </motion.a>
-    );
-};
-
-// --- Sections ---
-
-const Hero = () => {
-    return (
-        <section style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 10%' }}>
-            <motion.div>
-                <p style={{ color: '#00f0ff', fontFamily: 'monospace', marginBottom: '1rem' }}>
-                    <RevealText delay={0.1}>:: INITIALIZING SYSTEM...</RevealText>
-                </p>
-                <h1 style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', margin: 0, lineHeight: 0.9, fontWeight: 800 }}>
-                    <RevealText delay={0.2}>HELLO</RevealText> <br />
-                    <span style={{ color: '#ffffff' }}><RevealText delay={0.3}>WORLD.</RevealText></span>
-                </h1>
-                <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <div style={{ width: '2px', height: '60px', background: '#0aff68' }}></div>
-                    <div>
-                        <p style={{ margin: 0, fontSize: '1.2rem', color: '#94a3b8' }}>
-                            <RevealText delay={0.5}>CS Student & Creative Developer</RevealText>
-                        </p>
-                        <p style={{ margin: 0, fontSize: '1rem', color: '#64748b' }}>
-                            <RevealText delay={0.6}>Specializing in digital experiences & AI</RevealText>
-                        </p>
-                    </div>
-                </div>
-            </motion.div>
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1, duration: 1 }}
-                style={{ position: 'absolute', bottom: '3rem', left: '10%', fontFamily: 'monospace', color: '#444' }}
-            >
-                SCROLL TO DECRYPT [ ↓ ]
-            </motion.div>
-        </section>
-    );
-};
-
-const StickyTerminal = () => {
-    return (
-        <section style={{ padding: '5rem 10%', position: 'relative' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
-
-                {/* Left: Text */}
-                <div>
-                    <h2 style={{ fontSize: '3rem', margin: '0 0 2rem 0' }}>
-                        <span style={{ color: '#0aff68' }}>//</span> ABOUT_ME
-                    </h2>
-                    <p style={{ fontSize: '1.2rem', color: '#cbd5e1', lineHeight: 1.8 }}>
-                        I don't just write code; I architect digital realities. My background in Computer Science gives me the structure, but my passion for design breaks the boundaries.
-                    </p>
-                    <p style={{ fontSize: '1.2rem', color: '#94a3b8', lineHeight: 1.8, marginTop: '1.5rem' }}>
-                        Currently exploring the intersection of <span style={{ color: '#fff' }}>Neural Networks</span> and <span style={{ color: '#fff' }}>Web Aesthetics</span>.
-                    </p>
-                </div>
-
-                {/* Right: Terminal Visual */}
-                <motion.div
-                    className="glass-panel"
-                    whileHover={{ scale: 1.02, rotate: 1 }}
-                    style={{ padding: '1.5rem', minHeight: '300px', fontFamily: 'monospace', fontSize: '0.9rem' }}
-                >
-                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', opacity: 0.5 }}>
-                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff5f56' }} />
-                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffbd2e' }} />
-                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#27c93f' }} />
-                    </div>
-                    <div style={{ color: '#00f0ff' }}>➜  ~  whoami</div>
-                    <div style={{ color: '#e0e6ed', marginBottom: '1rem' }}>"Computer Science Fresher"</div>
-
-                    <div style={{ color: '#00f0ff' }}>➜  ~  cat skills.json</div>
-                    <div style={{ color: '#a5b3ce' }}>
-                        {`{
-  "languages": ["JS", "Python", "C++"],
-  "frontend": ["React", "Three.js", "Motion"],
-  "backend": ["Node", "SQL", "Cloud"],
-  "status": "Ready to Work"
-}`}
-                    </div>
-                    <motion.div
-                        animate={{ opacity: [0, 1] }}
-                        transition={{ repeat: Infinity, duration: 0.8 }}
-                        style={{ width: '10px', height: '18px', background: '#0aff68', marginTop: '5px' }}
-                    />
-                </motion.div>
+const TerminalPanel = () => (
+    <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '8px',
+        padding: '1.5rem',
+        fontFamily: 'Menlo, Monaco, Consolas, monospace',
+        fontSize: '0.9rem',
+        color: '#d4d4d4',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        maxWidth: '500px'
+    }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', borderBottom: '1px solid #333', paddingBottom: '0.8rem' }}>
+            <div style={{ w: 10, h: 10, r: '50%', bg: '#ef4444' }}></div>
+            <span style={{ color: '#666' }}>user@portfolio ~ </span>
+        </div>
+        <div>
+            <span style={{ color: '#c678dd' }}>const</span> <span style={{ color: '#e5c07b' }}>skills</span> = {'{'}
+            <div style={{ paddingLeft: '1.5rem', color: '#98c379' }}>
+                languages: <span style={{ color: '#d19a66' }}>['JavaScript', 'Python', 'SQL']</span>,
             </div>
-        </section>
-    );
-};
-
-const ProjectItem = ({ title, category, year }) => {
-    return (
-        <motion.div
-            className="project-item"
-            initial={{ opacity: 0.5, borderBottom: '1px solid rgba(255,255,255,0.1)' }}
-            whileHover={{ opacity: 1, borderBottom: '1px solid #00f0ff', paddingLeft: '20px' }}
-            transition={{ duration: 0.3 }}
-            style={{
-                padding: '2rem 0',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'baseline',
-                cursor: 'none',
-                position: 'relative'
-            }}
-            data-hover
-        >
-            <div>
-                <h3 style={{ fontSize: '2.5rem', margin: 0, fontWeight: 300 }}>{title}</h3>
-                <span style={{ fontFamily: 'monospace', color: '#00f0ff', fontSize: '0.9rem' }}>{category}</span>
+            <div style={{ paddingLeft: '1.5rem', color: '#98c379' }}>
+                frameworks: <span style={{ color: '#d19a66' }}>['React', 'Next.js', 'Node.js']</span>,
             </div>
-            <span style={{ fontSize: '1.2rem', color: '#64748b' }}>{year}</span>
-        </motion.div>
-    );
-};
-
-const Projects = () => {
-    return (
-        <section style={{ padding: '5rem 10%' }}>
-            <h2 style={{ fontSize: '1rem', fontFamily: 'monospace', color: '#64748b', marginBottom: '3rem' }}>
-                SELECTED_WORKS (03)
-            </h2>
-            <div>
-                <ProjectItem title="Neural Chat" category="AI / PYTHON / NLP" year="2024" />
-                <ProjectItem title="Cosmic Comm" category="REACT / THREE.JS / WEBGL" year="2023" />
-                <ProjectItem title="Data Viz Core" category="D3.JS / ANALYTICS" year="2023" />
+            <div style={{ paddingLeft: '1.5rem', color: '#98c379' }}>
+                tools: <span style={{ color: '#d19a66' }}>['Git', 'Docker', 'AWS']</span>
             </div>
-        </section>
-    );
-};
+            {'}'};
+        </div>
+    </div>
+);
 
-const Contact = () => {
-    return (
-        <section style={{ height: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-            <h2 style={{ fontSize: '4rem', marginBottom: '1rem' }}>LET'S COLLABORATE</h2>
-            <p style={{ maxWidth: '400px', color: '#94a3b8', marginBottom: '3rem' }}>
-                Ready to turn impossible ideas into functional code? I'm available for internships and freelance.
-            </p>
-            <MagneticButton
-                href="mailto:hello@example.com"
-                style={{
-                    padding: '1.5rem 3rem',
-                    borderRadius: '50px',
-                    background: '#fff',
-                    color: '#000',
-                    fontSize: '1.2rem',
-                    fontWeight: 'bold',
-                    border: 'none',
-                    position: 'relative',
-                    zIndex: 10
-                }}
-            >
-                INITIATE CONTACT
-            </MagneticButton>
-        </section>
-    );
-};
+const ProjectCard = ({ title, desc, tags, link }) => (
+    <motion.a
+        href={link}
+        target="_blank"
+        className="project-card"
+        whileHover={{ y: -4 }}
+        style={{
+            display: 'block',
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '12px',
+            padding: '2rem',
+            transition: 'border-color 0.2s',
+            cursor: 'pointer'
+        }}
+    >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)' }}>{title}</h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}>
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+        </div>
+        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.5rem' }}>{desc}</p>
+        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+            {tags.map(tag => (
+                <span key={tag} style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--accent-blue)',
+                    background: 'rgba(59, 130, 246, 0.1)',
+                    padding: '0.2rem 0.6rem',
+                    borderRadius: '4px'
+                }}>
+                    {tag}
+                </span>
+            ))}
+        </div>
+    </motion.a>
+);
+
+// --- Main Interface ---
 
 export const Interface = () => {
     const { scrollYProgress } = useScroll();
     const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
     return (
-        <div style={{ position: 'relative', zIndex: 10 }}>
-            {/* Scroll Progress Bar */}
+        <div style={{ paddingBottom: '4rem' }}>
+            {/* Scroll Indicator */}
             <motion.div
                 style={{
                     position: 'fixed',
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: '4px',
-                    background: '#00f0ff',
+                    height: '2px',
+                    background: 'var(--accent-blue)',
                     transformOrigin: '0%',
                     scaleX,
                     zIndex: 100
                 }}
             />
 
-            <Hero />
-            <StickyTerminal />
-            <Projects />
-            <Contact />
+            {/* 1. Hero */}
+            <section style={{ minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
+                <div className="container">
+                    <FadeIn>
+                        <p style={{ color: 'var(--accent-blue)', fontWeight: 500, letterSpacing: '0.05em', marginBottom: '1.5rem' }}>
+                            HELLO WORLD
+                        </p>
+                        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', lineHeight: 1.1, marginBottom: '1.5rem', color: '#fff' }}>
+                            Computer Science Student <br />
+                            <span style={{ color: 'var(--text-secondary)' }}>& Aspiring Engineer.</span>
+                        </h1>
+                        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: 1.6 }}>
+                            Building scalable software and accessible digital experiences. Focused on clean code, performance, and modern web technologies.
+                        </p>
+                    </FadeIn>
+                </div>
+            </section>
 
-            {/* Footer */}
-            <footer style={{ padding: '2rem', textAlign: 'center', opacity: 0.3, fontFamily: 'monospace' }}>
-                <p>SYSTEM.EXIT(0)</p>
-            </footer>
+            {/* 2. About */}
+            <section id="about">
+                <div className="container">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'center' }}>
+                        <FadeIn>
+                            <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>About Me</h2>
+                            <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+                                I am currently studying Computer Science with a focus on Software Engineering. My journey began with a curiosity for how things work, leading me to explore everything from low-level systems to modern frontend frameworks.
+                            </p>
+                            <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
+                                When I'm not coding, I'm analyzing data structures or contributing to open-source projects. I value clarity, efficiency, and continuous learning.
+                            </p>
+                        </FadeIn>
+                        <FadeIn delay={0.2}>
+                            <TerminalPanel />
+                        </FadeIn>
+                    </div>
+                </div>
+            </section>
+
+            <div className="container"><SectionDivider /></div>
+
+            {/* 3. Projects */}
+            <section id="projects">
+                <div className="container">
+                    <FadeIn>
+                        <h2 style={{ fontSize: '2rem', marginBottom: '3rem' }}>Selected Projects</h2>
+                    </FadeIn>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                        <FadeIn delay={0.1}>
+                            <ProjectCard
+                                title="AI Study Assistant"
+                                desc="A web application utilizing OpenAI's API to help students summarize notes and generate flashcards automatically."
+                                tags={['Next.js', 'Python', 'OpenAI API']}
+                                link="#"
+                            />
+                        </FadeIn>
+                        <FadeIn delay={0.2}>
+                            <ProjectCard
+                                title="Algorithm Visualizer"
+                                desc="Interactive platform visualizing common sorting and pathfinding algorithms to aid in CS education."
+                                tags={['React', 'TypeScript', 'D3.js']}
+                                link="#"
+                            />
+                        </FadeIn>
+                        <FadeIn delay={0.3}>
+                            <ProjectCard
+                                title="Cloud File Manager"
+                                desc="Secure file storage system with drag-and-drop uploads, folder organization, and sharable links."
+                                tags={['AWS S3', 'Node.js', 'MongoDB']}
+                                link="#"
+                            />
+                        </FadeIn>
+                    </div>
+                </div>
+            </section>
+
+            <div className="container"><SectionDivider /></div>
+
+            {/* 4. Contact */}
+            <section id="contact" style={{ textAlign: 'center', padding: '4rem 0' }}>
+                <div className="container">
+                    <FadeIn>
+                        <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Get In Touch</h2>
+                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto 2.5rem' }}>
+                            I'm currently looking for internship opportunities for Summer 2026. Feel free to reach out.
+                        </p>
+                        <a
+                            href="mailto:hello@example.com"
+                            style={{
+                                display: 'inline-block',
+                                background: '#fff',
+                                color: '#000',
+                                padding: '1rem 2.5rem',
+                                borderRadius: '6px',
+                                fontSize: '1.1rem',
+                                fontWeight: 500
+                            }}
+                        >
+                            Email Me
+                        </a>
+                    </FadeIn>
+                </div>
+            </section>
+
         </div>
     );
 };
