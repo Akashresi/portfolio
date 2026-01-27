@@ -1,14 +1,60 @@
-import { useRef } from 'react';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import { motion, useScroll, useSpring, useMotionValue, useTransform } from 'framer-motion';
 
-// --- Visual Components ---
+// --- Animated Tilt Card Component ---
+const TiltCard = ({ children, className = "", style = {}, href }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    // Mouse relative to the center of the card
+    const rotateX = useTransform(y, [-100, 100], [5, -5]); // Invert Y for tilt
+    const rotateY = useTransform(x, [-100, 100], [-5, 5]);
+
+    const handleMouseMove = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        // Calculate offset from center
+        const offsetX = e.clientX - (rect.left + rect.width / 2);
+        const offsetY = e.clientY - (rect.top + rect.height / 2);
+        x.set(offsetX);
+        y.set(offsetY);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    const Component = href ? motion.a : motion.div;
+
+    return (
+        <Component
+            href={href}
+            target={href ? "_blank" : undefined}
+            className={`glass-panel ${className}`}
+            style={{
+                ...style,
+                rotateX,
+                rotateY,
+                transformStyle: "preserve-3d", // Crucial for 3D effect
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            whileHover={{ scale: 1.02, z: 20 }} // Slight elevation
+        >
+            <div style={{ transform: "translateZ(20px)" }}> {/* Parallax inner content */}
+                {children}
+            </div>
+        </Component>
+    );
+};
+
 
 const FadeIn = ({ children, delay = 0 }) => (
     <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, y: 30, rotateX: 10 }}
+        whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
         viewport={{ once: true, margin: "-10%" }}
-        transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }} // Soft easing
+        transition={{ duration: 1, delay, ease: [0.22, 1, 0.36, 1] }}
+        style={{ transformStyle: 'preserve-3d' }}
     >
         {children}
     </motion.div>
@@ -21,14 +67,15 @@ const SectionHeading = ({ children }) => (
 );
 
 const TerminalProfile = () => (
-    <div className="glass-panel" style={{
+    <TiltCard style={{
         borderRadius: '12px',
         padding: '2rem',
         fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
         fontSize: '0.9rem',
         lineHeight: 1.7,
         width: '100%',
-        maxWidth: '480px'
+        maxWidth: '480px',
+        cursor: 'default'
     }}>
         <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.5rem', opacity: 0.6 }}>
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
@@ -65,14 +112,12 @@ const TerminalProfile = () => (
 
             <div>{'}'}</div>
         </div>
-    </div>
+    </TiltCard>
 );
 
 const ProjectCard = ({ title, desc, stack, link }) => (
-    <motion.a
+    <TiltCard
         href={link}
-        target="_blank"
-        className="glass-panel"
         style={{
             borderRadius: '16px',
             padding: '2.5rem',
@@ -82,8 +127,6 @@ const ProjectCard = ({ title, desc, stack, link }) => (
             justifyContent: 'space-between',
             textDecoration: 'none'
         }}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.98 }}
     >
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -109,7 +152,7 @@ const ProjectCard = ({ title, desc, stack, link }) => (
                 </span>
             ))}
         </div>
-    </motion.a>
+    </TiltCard>
 );
 
 // --- Layout ---
@@ -119,7 +162,8 @@ export const Interface = () => {
     const scaleX = useSpring(scrollYProgress, { stiffness: 60, damping: 20 });
 
     return (
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', perspective: '1000px' }}> {/* Add perspective for global depth feel */}
+
             {/* Soft Scroll Progress */}
             <motion.div style={{
                 position: 'fixed', top: 0, left: 0, right: 0, height: '1px',
@@ -130,11 +174,15 @@ export const Interface = () => {
             <section style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', padding: '0 5%' }}>
                 <div className="container">
                     <FadeIn>
-                        <div style={{ display: 'inline-block', padding: '0.4rem 1rem', borderRadius: '50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '2rem', fontSize: '0.9rem', color: '#d4d4d8' }}>
+                        <motion.div
+                            initial={{ z: 0 }}
+                            whileHover={{ z: 10 }}
+                            style={{ display: 'inline-block', padding: '0.4rem 1rem', borderRadius: '50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '2rem', fontSize: '0.9rem', color: '#d4d4d8' }}
+                        >
                             👋 Available for Summer 2026 Internships
-                        </div>
+                        </motion.div>
                         <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', lineHeight: 1.1, marginBottom: '1.5rem' }}>
-                            Designing the future <br /> with <span style={{ color: '#60a5fa' }}>clean code</span>.
+                            Designing the future <br /> with <span style={{ color: '#38bdf8' }}>clean code</span>.
                         </h1>
                         <p style={{ maxWidth: '600px', fontSize: '1.2rem', lineHeight: 1.6, color: '#a1a1aa' }}>
                             I'm a Computer Science student passionate about building accessible, high-performance web applications that feel effortless to use.
@@ -222,10 +270,11 @@ export const Interface = () => {
                             padding: '1.2rem 3rem',
                             fontSize: '1.1rem',
                             fontWeight: 600,
-                            color: '#0d0d0f',
-                            background: '#fff',
+                            color: '#0e0e11',
+                            background: '#38bdf8',
                             borderRadius: '50px',
-                            boxShadow: '0 0 20px rgba(255,255,255,0.2)'
+                            boxShadow: '0 0 20px rgba(56, 189, 248, 0.4)',
+                            textDecoration: 'none'
                         }}>
                             Get In Touch
                         </a>
@@ -234,7 +283,7 @@ export const Interface = () => {
             </section>
 
             <footer style={{ padding: '3rem', textAlign: 'center', color: '#52525b', fontSize: '0.9rem' }}>
-                <p style={{ margin: 0 }}>© 2026 Portfolio. Built with React & Motion.</p>
+                <p style={{ margin: 0 }}>© 2026 Portfolio. Built with React Three Fiber & Motion.</p>
             </footer>
         </div>
     );
