@@ -74,7 +74,6 @@ const ProjectCard = ({ title, desc, stack, link }) => (
         target="_blank"
         className="glass-panel"
         style={{
-            display: 'block',
             borderRadius: '16px',
             padding: '2.5rem',
             height: '100%',
