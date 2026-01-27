@@ -56,7 +56,7 @@ export const Interface = () => {
                         HELLO WORLD
                     </h1>
                     <h2 style={{ fontSize: '2rem', margin: '0.5rem 0', color: '#fff' }}>I'm a CS Student</h2>
-                    <p style={{ fontSize: '1.2rem', opacity: 0.8 }}>Aspiring Software Engineer | Creative Developeer</p>
+                    <p style={{ fontSize: '1.2rem', opacity: 0.8 }}>Aspiring Software Engineer | Creative Developer</p>
                 </motion.div>
             </Section>
 

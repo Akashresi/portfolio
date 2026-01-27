@@ -4,11 +4,35 @@ export const Hero3D = () => {
     return (
         <group>
             <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                {/* Placeholder for 3D Avatar */}
-                <mesh position={[2, 0, 0]} scale={1.5}>
-                    <capsuleGeometry args={[0.5, 1.5, 4, 8]} />
-                    <MeshDistortMaterial color="#00d2ff" speed={2} distort={0.3} roughness={0.2} metalness={0.8} />
-                </mesh>
+                {/* Futuristic Avatar Representation */}
+                <group position={[2, -1, 0]} rotation={[0, -0.5, 0]}>
+                    {/* Head */}
+                    <mesh position={[0, 1.5, 0]}>
+                        <icosahedronGeometry args={[0.3, 1]} />
+                        <meshStandardMaterial color="#00d2ff" roughness={0.3} metalness={0.8} />
+                    </mesh>
+                    {/* Glowing Eyes */}
+                    <mesh position={[0.15, 1.55, 0.2]}>
+                        <sphereGeometry args={[0.05]} />
+                        <meshBasicMaterial color="#ffffff" />
+                    </mesh>
+
+                    {/* Body */}
+                    <mesh position={[0, 0.8, 0]}>
+                        <cylinderGeometry args={[0.1, 0.3, 1.2, 8]} />
+                        <MeshDistortMaterial color="#1a1a2e" speed={2} distort={0.4} />
+                    </mesh>
+
+                    {/* Floating Tech Rings around */}
+                    <mesh position={[0, 0.8, 0]}>
+                        <torusGeometry args={[0.6, 0.02, 16, 32]} />
+                        <meshBasicMaterial color="#3a7bd5" transparent opacity={0.5} />
+                    </mesh>
+                    <mesh position={[0, 0.8, 0]} rotation={[0.5, 0, 0]}>
+                        <torusGeometry args={[0.8, 0.02, 16, 32]} />
+                        <meshBasicMaterial color="#9d50bb" transparent opacity={0.3} />
+                    </mesh>
+                </group>
             </Float>
 
             {/* Floating Code Snippets decor */}
