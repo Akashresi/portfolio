@@ -60,6 +60,7 @@ h1.glow-text {
 .text-gradient {
   background: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
