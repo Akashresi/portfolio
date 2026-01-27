@@ -1,277 +1,255 @@
-import { motion } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
 
-// --- Reusable Components ---
+// --- Shared Components ---
 
-const Section = ({ id, children, align = 'center' }) => {
+const RevealText = ({ children, delay = 0 }) => {
     return (
-        <section id={id} className="section" style={{ justifyContent: align === 'center' ? 'center' : 'flex-start' }}>
-            <div className="container" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start' }}>
-                {children}
+        <motion.span
+            initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 0.8, delay, ease: [0.2, 0.65, 0.3, 0.9] }}
+            viewport={{ once: true }}
+            style={{ display: 'inline-block' }}
+        >
+            {children}
+        </motion.span>
+    );
+};
+
+const MagneticButton = ({ children, style, href }) => {
+    const ref = useRef(null);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
+    const springX = useSpring(x, springConfig);
+    const springY = useSpring(y, springConfig);
+
+    const handleMouseMove = (e) => {
+        const { clientX, clientY } = e;
+        const { left, top, width, height } = ref.current.getBoundingClientRect();
+        const centerX = left + width / 2;
+        const centerY = top + height / 2;
+        x.set((clientX - centerX) * 0.3); // Magnetic pull strength
+        y.set((clientY - centerY) * 0.3);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
+
+    return (
+        <motion.a
+            ref={ref}
+            href={href}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            style={{
+                ...style,
+                x: springX,
+                y: springY,
+                display: 'inline-block',
+                textDecoration: 'none',
+                cursor: 'none' // Handled by CustomCursor
+            }}
+            data-hover // Signal for cursor to grow
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+        >
+            {children}
+        </motion.a>
+    );
+};
+
+// --- Sections ---
+
+const Hero = () => {
+    return (
+        <section style={{ height: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 10%' }}>
+            <motion.div>
+                <p style={{ color: '#00f0ff', fontFamily: 'monospace', marginBottom: '1rem' }}>
+                    <RevealText delay={0.1}>:: INITIALIZING SYSTEM...</RevealText>
+                </p>
+                <h1 style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', margin: 0, lineHeight: 0.9, fontWeight: 800 }}>
+                    <RevealText delay={0.2}>HELLO</RevealText> <br />
+                    <span style={{ color: '#ffffff' }}><RevealText delay={0.3}>WORLD.</RevealText></span>
+                </h1>
+                <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ width: '2px', height: '60px', background: '#0aff68' }}></div>
+                    <div>
+                        <p style={{ margin: 0, fontSize: '1.2rem', color: '#94a3b8' }}>
+                            <RevealText delay={0.5}>CS Student & Creative Developer</RevealText>
+                        </p>
+                        <p style={{ margin: 0, fontSize: '1rem', color: '#64748b' }}>
+                            <RevealText delay={0.6}>Specializing in digital experiences & AI</RevealText>
+                        </p>
+                    </div>
+                </div>
+            </motion.div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 1 }}
+                style={{ position: 'absolute', bottom: '3rem', left: '10%', fontFamily: 'monospace', color: '#444' }}
+            >
+                SCROLL TO DECRYPT [ ↓ ]
+            </motion.div>
+        </section>
+    );
+};
+
+const StickyTerminal = () => {
+    return (
+        <section style={{ padding: '5rem 10%', position: 'relative' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}>
+
+                {/* Left: Text */}
+                <div>
+                    <h2 style={{ fontSize: '3rem', margin: '0 0 2rem 0' }}>
+                        <span style={{ color: '#0aff68' }}>//</span> ABOUT_ME
+                    </h2>
+                    <p style={{ fontSize: '1.2rem', color: '#cbd5e1', lineHeight: 1.8 }}>
+                        I don't just write code; I architect digital realities. My background in Computer Science gives me the structure, but my passion for design breaks the boundaries.
+                    </p>
+                    <p style={{ fontSize: '1.2rem', color: '#94a3b8', lineHeight: 1.8, marginTop: '1.5rem' }}>
+                        Currently exploring the intersection of <span style={{ color: '#fff' }}>Neural Networks</span> and <span style={{ color: '#fff' }}>Web Aesthetics</span>.
+                    </p>
+                </div>
+
+                {/* Right: Terminal Visual */}
+                <motion.div
+                    className="glass-panel"
+                    whileHover={{ scale: 1.02, rotate: 1 }}
+                    style={{ padding: '1.5rem', minHeight: '300px', fontFamily: 'monospace', fontSize: '0.9rem' }}
+                >
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', opacity: 0.5 }}>
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ff5f56' }} />
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#ffbd2e' }} />
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#27c93f' }} />
+                    </div>
+                    <div style={{ color: '#00f0ff' }}>➜  ~  whoami</div>
+                    <div style={{ color: '#e0e6ed', marginBottom: '1rem' }}>"Computer Science Fresher"</div>
+
+                    <div style={{ color: '#00f0ff' }}>➜  ~  cat skills.json</div>
+                    <div style={{ color: '#a5b3ce' }}>
+                        {`{
+  "languages": ["JS", "Python", "C++"],
+  "frontend": ["React", "Three.js", "Motion"],
+  "backend": ["Node", "SQL", "Cloud"],
+  "status": "Ready to Work"
+}`}
+                    </div>
+                    <motion.div
+                        animate={{ opacity: [0, 1] }}
+                        transition={{ repeat: Infinity, duration: 0.8 }}
+                        style={{ width: '10px', height: '18px', background: '#0aff68', marginTop: '5px' }}
+                    />
+                </motion.div>
             </div>
         </section>
     );
 };
 
-const SectionTitle = ({ children }) => (
-    <motion.h2
-        className="glow-text"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        style={{
-            fontSize: '3rem',
-            marginBottom: '3rem',
-            color: '#fff',
-            textAlign: 'center',
-            position: 'relative',
-            display: 'inline-block'
-        }}
-    >
-        {children}
-        <span style={{
-            display: 'block',
-            width: '50%',
-            height: '4px',
-            background: 'var(--neon-blue)',
-            margin: '0.5rem auto 0',
-            borderRadius: '2px'
-        }} />
-    </motion.h2>
-);
-
-const GlassCard = ({ children, className = '', delay = 0 }) => (
-    <motion.div
-        className={`glass-card ${className}`}
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay }}
-        viewport={{ once: true }}
-        style={{ padding: '2.5rem', borderRadius: '16px', width: '100%', boxSizing: 'border-box' }}
-    >
-        {children}
-    </motion.div>
-);
-
-const SkillTag = ({ name }) => (
-    <span style={{
-        padding: '0.6rem 1.2rem',
-        borderRadius: '50px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
-        color: '#fff',
-        fontSize: '0.9rem',
-        fontWeight: '500'
-    }}>
-        {name}
-    </span>
-);
-
-const ProjectCard = ({ title, tech, desc, link, delay }) => (
-    <GlassCard delay={delay} className="project-card">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.8rem', margin: 0, color: 'var(--neon-blue)' }}>{title}</h3>
-            <a href={link} target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'none', fontSize: '1.5rem' }}>↗</a>
-        </div>
-        <p style={{ color: '#ccc', lineHeight: 1.6, marginBottom: '1.5rem' }}>{desc}</p>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            {tech.map((t, i) => <span key={i} style={{ fontSize: '0.8rem', color: 'var(--neon-green)', fontFamily: 'monospace' }}>#{t}</span>)}
-        </div>
-    </GlassCard>
-);
-
-// --- Main Interface ---
-
-export const Interface = () => {
+const ProjectItem = ({ title, category, year }) => {
     return (
-        <div style={{ position: 'relative', zIndex: 1 }}>
-
-            {/* 1. Hero Section */}
-            <Section id="home" align="left">
-                <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 1 }}
-                    style={{ maxWidth: '800px' }}
-                >
-                    <h3 style={{ color: 'var(--neon-green)', fontFamily: 'monospace', fontSize: '1.2rem', marginBottom: '1rem' }}>
-                        &lt;user&gt; Welcome &lt;/user&gt;
-                    </h3>
-                    <h1 style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', fontWeight: 800, margin: 0, lineHeight: 1.1 }}>
-                        HELLO <br />
-                        <span className="text-gradient">WORLD.</span>
-                    </h1>
-                    <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', color: '#aaa', margin: '2rem 0' }}>
-                        I am a <span style={{ color: '#fff' }}>Computer Science Student</span> &<br /> Aspiring Software Engineer.
-                    </h2>
-                    <p style={{ maxWidth: '500px', lineHeight: 1.8, fontSize: '1.1rem', color: '#ccc', marginBottom: '2.5rem' }}>
-                        Crafting scalable software and immersive digital experiences.
-                        Focused on AI, Web Technologies, and clean code.
-                    </p>
-                    <motion.button
-                        whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(0, 243, 255, 0.4)' }}
-                        whileTap={{ scale: 0.95 }}
-                        style={{
-                            padding: '1rem 2.5rem',
-                            fontSize: '1.1rem',
-                            background: 'transparent',
-                            border: '2px solid var(--neon-blue)',
-                            color: 'var(--neon-blue)',
-                            borderRadius: '50px',
-                            cursor: 'pointer',
-                            fontWeight: 600,
-                            letterSpacing: '1px'
-                        }}
-                    >
-                        EXPLORE WORK
-                    </motion.button>
-                </motion.div>
-            </Section>
-
-            {/* 2. About Me */}
-            <Section id="about" align="center">
-                <SectionTitle>About Me</SectionTitle>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', width: '100%' }}>
-                    <GlassCard delay={0.2}>
-                        <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: '#ddd' }}>
-                            I'm currently pursuing my degree in Computer Science. My passion lies in solving complex problems through elegant code.
-                            I started my journey with simple scripts and have since fallen in love with full-stack development and artificial intelligence.
-                        </p>
-                    </GlassCard>
-                    <GlassCard delay={0.4}>
-                        <h3 style={{ color: 'var(--neon-purple)', marginTop: 0 }}>Education</h3>
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <h4 style={{ margin: '0 0 0.5rem 0' }}>B.S. Computer Science</h4>
-                            <p style={{ margin: 0, color: '#888', fontSize: '0.9rem' }}>University of Technology, 2023 - Present</p>
-                        </div>
-                        <div>
-                            <h4 style={{ margin: '0 0 0.5rem 0' }}>High School</h4>
-                            <p style={{ margin: 0, color: '#888', fontSize: '0.9rem' }}>Science Major, 2021 - 2023</p>
-                        </div>
-                    </GlassCard>
-                </div>
-            </Section>
-
-            {/* 3. Skills & Stack */}
-            <Section id="skills" align="center">
-                <SectionTitle>Skills & Stack</SectionTitle>
-                <div style={{ width: '100%', maxWidth: '800px' }}>
-
-                    <GlassCard>
-                        <div style={{ display: 'grid', gap: '3rem' }}>
-                            <div>
-                                <h3 style={{ color: '#fff', borderLeft: '4px solid var(--neon-blue)', paddingLeft: '1rem', marginBottom: '1.5rem' }}>Languages</h3>
-                                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                    {['JavaScript (ES6+)', 'Python', 'C++', 'Java', 'SQL', 'HTML/CSS'].map(s => <SkillTag key={s} name={s} />)}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 style={{ color: '#fff', borderLeft: '4px solid var(--neon-purple)', paddingLeft: '1rem', marginBottom: '1.5rem' }}>Frameworks & Libraries</h3>
-                                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                    {['React.js', 'Next.js', 'Node.js', 'Three.js', 'Tailwind CSS', 'Framer Motion'].map(s => <SkillTag key={s} name={s} />)}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 style={{ color: '#fff', borderLeft: '4px solid var(--neon-green)', paddingLeft: '1rem', marginBottom: '1.5rem' }}>Tools</h3>
-                                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                                    {['Git & GitHub', 'VS Code', 'Figma', 'Postman', 'Vercel', 'Docker'].map(s => <SkillTag key={s} name={s} />)}
-                                </div>
-                            </div>
-                        </div>
-                    </GlassCard>
-                </div>
-            </Section>
-
-            {/* 4. Projects */}
-            <Section id="projects" align="center">
-                <SectionTitle>Featured Projects</SectionTitle>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', width: '100%' }}>
-                    <ProjectCard
-                        title="AI Chatbot Assistant"
-                        desc="A smart chatbot built with Python and TensorFlow that can answer query related to campus activities. Integrated with a Flask backend."
-                        tech={['Python', 'NLP', 'Flask', 'React']}
-                        link="#"
-                        delay={0.1}
-                    />
-                    <ProjectCard
-                        title="E-Commerce Dashboard"
-                        desc="Full-stack admin dashboard for managing products and orders. Features real-time analytics charts and secure authentication."
-                        tech={['MERN Stack', 'Chart.js', 'JWT']}
-                        link="#"
-                        delay={0.3}
-                    />
-                    <ProjectCard
-                        title="Crypto Tracker"
-                        desc="Real-time cryptocurrency price tracker using CoinGecko API. Features dark mode and historical price graphs."
-                        tech={['React', 'Axios', 'Tailwind']}
-                        link="#"
-                        delay={0.5}
-                    />
-                </div>
-            </Section>
-
-            {/* 5. Contact */}
-            <Section id="contact" align="center">
-                <div style={{ width: '100%', maxWidth: '600px', textAlign: 'center' }}>
-                    <SectionTitle>Get In Touch</SectionTitle>
-                    <GlassCard>
-                        <p style={{ color: '#ccc', marginBottom: '2rem' }}>
-                            Whether you have a question, a project idea, or just want to say hi, I'll try my best to get back to you!
-                        </p>
-                        <form style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <input type="text" placeholder="Name" style={inputStyle} />
-                                <input type="email" placeholder="Email" style={inputStyle} />
-                            </div>
-                            <input type="text" placeholder="Subject" style={inputStyle} />
-                            <textarea placeholder="Message" rows={5} style={{ ...inputStyle, resize: 'vertical' }}></textarea>
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                                style={submitButtonStyle}
-                            >
-                                Send Message
-                            </motion.button>
-                        </form>
-                    </GlassCard>
-                </div>
-            </Section>
-
-            {/* Footer */}
-            <footer style={{ padding: '2rem', textAlign: 'center', color: '#666', fontSize: '0.9rem', borderTop: '1px solid #111' }}>
-                <p>© 2026 AR Portfolio. Code by Me.</p>
-            </footer>
-        </div>
+        <motion.div
+            className="project-item"
+            initial={{ opacity: 0.5, borderBottom: '1px solid rgba(255,255,255,0.1)' }}
+            whileHover={{ opacity: 1, borderBottom: '1px solid #00f0ff', paddingLeft: '20px' }}
+            transition={{ duration: 0.3 }}
+            style={{
+                padding: '2rem 0',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'baseline',
+                cursor: 'none',
+                position: 'relative'
+            }}
+            data-hover
+        >
+            <div>
+                <h3 style={{ fontSize: '2.5rem', margin: 0, fontWeight: 300 }}>{title}</h3>
+                <span style={{ fontFamily: 'monospace', color: '#00f0ff', fontSize: '0.9rem' }}>{category}</span>
+            </div>
+            <span style={{ fontSize: '1.2rem', color: '#64748b' }}>{year}</span>
+        </motion.div>
     );
 };
 
-// --- Styles ---
-const inputStyle = {
-    background: 'rgba(0, 0, 0, 0.4)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    padding: '1rem',
-    borderRadius: '8px',
-    color: '#fff',
-    fontFamily: 'inherit',
-    fontSize: '1rem',
-    outline: 'none',
-    width: '100%',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.3s'
+const Projects = () => {
+    return (
+        <section style={{ padding: '5rem 10%' }}>
+            <h2 style={{ fontSize: '1rem', fontFamily: 'monospace', color: '#64748b', marginBottom: '3rem' }}>
+                SELECTED_WORKS (03)
+            </h2>
+            <div>
+                <ProjectItem title="Neural Chat" category="AI / PYTHON / NLP" year="2024" />
+                <ProjectItem title="Cosmic Comm" category="REACT / THREE.JS / WEBGL" year="2023" />
+                <ProjectItem title="Data Viz Core" category="D3.JS / ANALYTICS" year="2023" />
+            </div>
+        </section>
+    );
 };
 
-const submitButtonStyle = {
-    background: 'linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-purple) 100%)',
-    border: 'none',
-    padding: '1rem',
-    borderRadius: '8px',
-    color: '#fff',
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-    textTransform: 'uppercase',
-    letterSpacing: '1px',
-    boxShadow: '0 4px 15px rgba(0, 243, 255, 0.3)'
+const Contact = () => {
+    return (
+        <section style={{ height: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '4rem', marginBottom: '1rem' }}>LET'S COLLABORATE</h2>
+            <p style={{ maxWidth: '400px', color: '#94a3b8', marginBottom: '3rem' }}>
+                Ready to turn impossible ideas into functional code? I'm available for internships and freelance.
+            </p>
+            <MagneticButton
+                href="mailto:hello@example.com"
+                style={{
+                    padding: '1.5rem 3rem',
+                    borderRadius: '50px',
+                    background: '#fff',
+                    color: '#000',
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold',
+                    border: 'none',
+                    position: 'relative',
+                    zIndex: 10
+                }}
+            >
+                INITIATE CONTACT
+            </MagneticButton>
+        </section>
+    );
+};
+
+export const Interface = () => {
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+    return (
+        <div style={{ position: 'relative', zIndex: 10 }}>
+            {/* Scroll Progress Bar */}
+            <motion.div
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: '#00f0ff',
+                    transformOrigin: '0%',
+                    scaleX,
+                    zIndex: 100
+                }}
+            />
+
+            <Hero />
+            <StickyTerminal />
+            <Projects />
+            <Contact />
+
+            {/* Footer */}
+            <footer style={{ padding: '2rem', textAlign: 'center', opacity: 0.3, fontFamily: 'monospace' }}>
+                <p>SYSTEM.EXIT(0)</p>
+            </footer>
+        </div>
+    );
 };
