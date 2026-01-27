@@ -1,186 +1,208 @@
 import { useRef } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 
-// --- Components ---
+// --- Visual Components ---
 
 const FadeIn = ({ children, delay = 0 }) => (
     <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6, delay, ease: "easeOut" }}
+        viewport={{ once: true, margin: "-10%" }}
+        transition={{ duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] }} // Soft easing
     >
         {children}
     </motion.div>
 );
 
-const SectionDivider = () => (
-    <div style={{ width: '100%', height: '1px', background: 'var(--border-subtle)', margin: '6rem 0' }} />
+const SectionHeading = ({ children }) => (
+    <h2 style={{ fontSize: '2.5rem', marginBottom: '3rem', fontWeight: 500 }}>
+        {children}
+    </h2>
 );
 
-const TerminalPanel = () => (
-    <div style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-subtle)',
-        borderRadius: '8px',
-        padding: '1.5rem',
-        fontFamily: 'Menlo, Monaco, Consolas, monospace',
+const TerminalProfile = () => (
+    <div className="glass-panel" style={{
+        borderRadius: '12px',
+        padding: '2rem',
+        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
         fontSize: '0.9rem',
-        color: '#d4d4d4',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        maxWidth: '500px'
+        lineHeight: 1.7,
+        width: '100%',
+        maxWidth: '480px'
     }}>
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', borderBottom: '1px solid #333', paddingBottom: '0.8rem' }}>
-            <div style={{ w: 10, h: 10, r: '50%', bg: '#ef4444' }}></div>
-            <span style={{ color: '#666' }}>user@portfolio ~ </span>
+        <div style={{ display: 'flex', gap: '0.6rem', marginBottom: '1.5rem', opacity: 0.6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#fff', opacity: 0.5 }} />
         </div>
+
         <div>
-            <span style={{ color: '#c678dd' }}>const</span> <span style={{ color: '#e5c07b' }}>skills</span> = {'{'}
-            <div style={{ paddingLeft: '1.5rem', color: '#98c379' }}>
-                languages: <span style={{ color: '#d19a66' }}>['JavaScript', 'Python', 'SQL']</span>,
+            <div style={{ marginBottom: '1rem' }}>
+                <span style={{ color: '#7dd3fc' }}>class</span> <span style={{ color: '#fff', fontWeight: 'bold' }}>Student</span> <span style={{ color: '#7dd3fc' }}>implements</span> Developer {'{'}
             </div>
-            <div style={{ paddingLeft: '1.5rem', color: '#98c379' }}>
-                frameworks: <span style={{ color: '#d19a66' }}>['React', 'Next.js', 'Node.js']</span>,
+
+            <div style={{ paddingLeft: '1.5rem', color: '#a1a1aa' }}>
+                constructor() {'{'}
+                <div style={{ paddingLeft: '1.5rem' }}>
+                    this.name = <span style={{ color: '#86efac' }}>"Alex"</span>;
+                </div>
+                <div style={{ paddingLeft: '1.5rem' }}>
+                    this.focus = <span style={{ color: '#86efac' }}>"AI & Web Performance"</span>;
+                </div>
+                {'}'}
             </div>
-            <div style={{ paddingLeft: '1.5rem', color: '#98c379' }}>
-                tools: <span style={{ color: '#d19a66' }}>['Git', 'Docker', 'AWS']</span>
+
+            <div style={{ paddingLeft: '1.5rem', color: '#a1a1aa', marginTop: '0.5rem' }}>
+                skills() {'{'}
+                <div style={{ paddingLeft: '1.5rem' }}>
+                    return [
+                    <span style={{ color: '#fca5a5' }}>"React"</span>,
+                    <span style={{ color: '#fca5a5' }}>"TypeScript"</span>,
+                    <span style={{ color: '#fca5a5' }}>"Node.js"</span>
+                    ];
+                </div>
+                {'}'}
             </div>
-            {'}'};
+
+            <div>{'}'}</div>
         </div>
     </div>
 );
 
-const ProjectCard = ({ title, desc, tags, link }) => (
+const ProjectCard = ({ title, desc, stack, link }) => (
     <motion.a
         href={link}
         target="_blank"
-        className="project-card"
-        whileHover={{ y: -4 }}
+        className="glass-panel"
         style={{
             display: 'block',
-            background: 'var(--bg-secondary)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '12px',
-            padding: '2rem',
-            transition: 'border-color 0.2s',
-            cursor: 'pointer'
+            borderRadius: '16px',
+            padding: '2.5rem',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            textDecoration: 'none'
         }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.98 }}
     >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-            <h3 style={{ fontSize: '1.5rem', color: 'var(--text-primary)' }}>{title}</h3>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}>
-                <line x1="7" y1="17" x2="17" y2="7"></line>
-                <polyline points="7 7 17 7 17 17"></polyline>
-            </svg>
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 600, margin: 0 }}>{title}</h3>
+                <span style={{ opacity: 0.4, fontSize: '1.2rem' }}>↗</span>
+            </div>
+            <p style={{ fontSize: '1rem', lineHeight: 1.6, color: '#a1a1aa' }}>
+                {desc}
+            </p>
         </div>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.5rem' }}>{desc}</p>
-        <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-            {tags.map(tag => (
-                <span key={tag} style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--accent-blue)',
-                    background: 'rgba(59, 130, 246, 0.1)',
-                    padding: '0.2rem 0.6rem',
-                    borderRadius: '4px'
+
+        <div style={{ marginTop: '2rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+            {stack.map((item, i) => (
+                <span key={i} style={{
+                    fontSize: '0.8rem',
+                    padding: '0.3rem 0.8rem',
+                    borderRadius: '20px',
+                    background: 'rgba(255,255,255,0.05)',
+                    color: '#e4e4e7',
+                    border: '1px solid rgba(255,255,255,0.05)'
                 }}>
-                    {tag}
+                    {item}
                 </span>
             ))}
         </div>
     </motion.a>
 );
 
-// --- Main Interface ---
+// --- Layout ---
 
 export const Interface = () => {
     const { scrollYProgress } = useScroll();
-    const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+    const scaleX = useSpring(scrollYProgress, { stiffness: 60, damping: 20 });
 
     return (
-        <div style={{ paddingBottom: '4rem' }}>
-            {/* Scroll Indicator */}
-            <motion.div
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '2px',
-                    background: 'var(--accent-blue)',
-                    transformOrigin: '0%',
-                    scaleX,
-                    zIndex: 100
-                }}
-            />
+        <div style={{ position: 'relative' }}>
+            {/* Soft Scroll Progress */}
+            <motion.div style={{
+                position: 'fixed', top: 0, left: 0, right: 0, height: '1px',
+                background: 'rgba(255,255,255,0.2)', scaleX, transformOrigin: '0%', zIndex: 100
+            }} />
 
             {/* 1. Hero */}
-            <section style={{ minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
+            <section style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', padding: '0 5%' }}>
                 <div className="container">
                     <FadeIn>
-                        <p style={{ color: 'var(--accent-blue)', fontWeight: 500, letterSpacing: '0.05em', marginBottom: '1.5rem' }}>
-                            HELLO WORLD
-                        </p>
-                        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', lineHeight: 1.1, marginBottom: '1.5rem', color: '#fff' }}>
-                            Computer Science Student <br />
-                            <span style={{ color: 'var(--text-secondary)' }}>& Aspiring Engineer.</span>
+                        <div style={{ display: 'inline-block', padding: '0.4rem 1rem', borderRadius: '50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '2rem', fontSize: '0.9rem', color: '#d4d4d8' }}>
+                            👋 Available for Summer 2026 Internships
+                        </div>
+                        <h1 style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', lineHeight: 1.1, marginBottom: '1.5rem' }}>
+                            Designing the future <br /> with <span style={{ color: '#60a5fa' }}>clean code</span>.
                         </h1>
-                        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', maxWidth: '600px', lineHeight: 1.6 }}>
-                            Building scalable software and accessible digital experiences. Focused on clean code, performance, and modern web technologies.
+                        <p style={{ maxWidth: '600px', fontSize: '1.2rem', lineHeight: 1.6, color: '#a1a1aa' }}>
+                            I'm a Computer Science student passionate about building accessible, high-performance web applications that feel effortless to use.
                         </p>
                     </FadeIn>
                 </div>
             </section>
 
             {/* 2. About */}
-            <section id="about">
+            <section style={{ padding: '6rem 0' }}>
                 <div className="container">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'center' }}>
                         <FadeIn>
-                            <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>About Me</h2>
-                            <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
-                                I am currently studying Computer Science with a focus on Software Engineering. My journey began with a curiosity for how things work, leading me to explore everything from low-level systems to modern frontend frameworks.
+                            <SectionHeading>About Me</SectionHeading>
+                            <p>
+                                My fascination with technology started with gaming, but quickly evolved into a love for creation. Now, I use code to solve real-world problems.
                             </p>
-                            <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)' }}>
-                                When I'm not coding, I'm analyzing data structures or contributing to open-source projects. I value clarity, efficiency, and continuous learning.
+                            <p>
+                                I specialize in the JavaScript ecosystem, but I'm never afraid to dive into low-level systems (C++) or explore the latest in AI models.
                             </p>
+                            <div style={{ marginTop: '2rem', display: 'flex', gap: '2rem' }}>
+                                <div>
+                                    <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>Location</h4>
+                                    <span style={{ color: '#a1a1aa' }}>San Francisco, CA</span>
+                                </div>
+                                <div>
+                                    <h4 style={{ marginBottom: '0.5rem', color: '#fff' }}>Education</h4>
+                                    <span style={{ color: '#a1a1aa' }}>B.S. Computer Science</span>
+                                </div>
+                            </div>
                         </FadeIn>
+
                         <FadeIn delay={0.2}>
-                            <TerminalPanel />
+                            <TerminalProfile />
                         </FadeIn>
                     </div>
                 </div>
             </section>
 
-            <div className="container"><SectionDivider /></div>
-
             {/* 3. Projects */}
-            <section id="projects">
+            <section style={{ padding: '6rem 0' }}>
                 <div className="container">
                     <FadeIn>
-                        <h2 style={{ fontSize: '2rem', marginBottom: '3rem' }}>Selected Projects</h2>
+                        <SectionHeading>Selected Work</SectionHeading>
                     </FadeIn>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
                         <FadeIn delay={0.1}>
                             <ProjectCard
-                                title="AI Study Assistant"
-                                desc="A web application utilizing OpenAI's API to help students summarize notes and generate flashcards automatically."
-                                tags={['Next.js', 'Python', 'OpenAI API']}
+                                title="Lumina UI Kit"
+                                desc="A lightweight React component library designed for rapid prototyping with accessibility in mind."
+                                stack={['React', 'TypeScript', 'Storybook']}
                                 link="#"
                             />
                         </FadeIn>
                         <FadeIn delay={0.2}>
                             <ProjectCard
-                                title="Algorithm Visualizer"
-                                desc="Interactive platform visualizing common sorting and pathfinding algorithms to aid in CS education."
-                                tags={['React', 'TypeScript', 'D3.js']}
+                                title="Echo Note"
+                                desc="AI-powered note-taking app that summarizes lectures and generates quizzes instantly."
+                                stack={['Next.js', 'OpenAI', 'PostgreSQL']}
                                 link="#"
                             />
                         </FadeIn>
                         <FadeIn delay={0.3}>
                             <ProjectCard
-                                title="Cloud File Manager"
-                                desc="Secure file storage system with drag-and-drop uploads, folder organization, and sharable links."
-                                tags={['AWS S3', 'Node.js', 'MongoDB']}
+                                title="DevTrack"
+                                desc="A minimalist CLI tool for developers to track coding hours and productivity metrics."
+                                stack={['Rust', 'SQLite', 'CLI']}
                                 link="#"
                             />
                         </FadeIn>
@@ -188,34 +210,33 @@ export const Interface = () => {
                 </div>
             </section>
 
-            <div className="container"><SectionDivider /></div>
-
             {/* 4. Contact */}
-            <section id="contact" style={{ textAlign: 'center', padding: '4rem 0' }}>
+            <section style={{ padding: '8rem 0', textAlign: 'center' }}>
                 <div className="container">
                     <FadeIn>
-                        <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Get In Touch</h2>
-                        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto 2.5rem' }}>
-                            I'm currently looking for internship opportunities for Summer 2026. Feel free to reach out.
+                        <h2 style={{ fontSize: '3rem', marginBottom: '1.5rem' }}>Let's Build Together</h2>
+                        <p style={{ maxWidth: '500px', margin: '0 auto 3rem', fontSize: '1.2rem' }}>
+                            I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.
                         </p>
-                        <a
-                            href="mailto:hello@example.com"
-                            style={{
-                                display: 'inline-block',
-                                background: '#fff',
-                                color: '#000',
-                                padding: '1rem 2.5rem',
-                                borderRadius: '6px',
-                                fontSize: '1.1rem',
-                                fontWeight: 500
-                            }}
-                        >
-                            Email Me
+                        <a href="mailto:email@example.com" style={{
+                            display: 'inline-block',
+                            padding: '1.2rem 3rem',
+                            fontSize: '1.1rem',
+                            fontWeight: 600,
+                            color: '#0d0d0f',
+                            background: '#fff',
+                            borderRadius: '50px',
+                            boxShadow: '0 0 20px rgba(255,255,255,0.2)'
+                        }}>
+                            Get In Touch
                         </a>
                     </FadeIn>
                 </div>
             </section>
 
+            <footer style={{ padding: '3rem', textAlign: 'center', color: '#52525b', fontSize: '0.9rem' }}>
+                <p style={{ margin: 0 }}>© 2026 Portfolio. Built with React & Motion.</p>
+            </footer>
         </div>
     );
 };
