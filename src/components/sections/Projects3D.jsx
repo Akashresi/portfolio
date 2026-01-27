@@ -1,6 +1,6 @@
 import { Float, Text, Html } from '@react-three/drei'
 import { useState } from 'react'
-import { motion } from 'framer-motion-3d'
+// import { motion } from 'framer-motion-3d'
 
 const ProjectCard = ({ position, rotation, title, desc, color, github }) => {
     const [hovered, setHover] = useState(false)
