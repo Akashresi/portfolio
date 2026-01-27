@@ -1,142 +1,173 @@
-import { useRef, useMemo, useEffect } from 'react'
+import { useRef, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Float, Stars, Environment, PerspectiveCamera, useTexture } from '@react-three/drei'
+import { Stars, Float, MeshDistortMaterial, Instance, Instances } from '@react-three/drei'
 import * as THREE from 'three'
 
-// --- 3D Components ---
+// --- 3D Scene Components ---
 
-const ScrollCamera = () => {
-    const { camera } = useThree()
-
-    useFrame(() => {
-        // Smoothly interpolate camera position based on scrollY
-        // Standard webpage height is approximately document.body.scrollHeight
-        // We map scroll pixels to 3D units.
-        const scrollY = window.scrollY
-        const targetOp = scrollY * 0.01
-
-        // Move camera "down" and "forward" as user scrolls
-        camera.position.y = THREE.MathUtils.lerp(camera.position.y, -targetOp, 0.05)
-        camera.position.z = THREE.MathUtils.lerp(camera.position.z, 10 - targetOp * 0.5, 0.05)
-    })
-    return null
-}
-
-const DigitalGrid = () => {
-    // A moving wireframe terrain
-    const meshRef = useRef()
+const CinematicCamera = () => {
+    const { camera, mouse } = useThree()
+    const vec = new THREE.Vector3()
 
     useFrame((state) => {
         const t = state.clock.getElapsedTime()
-        meshRef.current.position.z = (t * 2) % 10 - 20 // Infinite forward movement effect
+        const scrollY = window.scrollY
+
+        // Calculate target position based on scroll
+        // Moving deep into the cosmos (negative Z) and slightly down (negative Y)
+        const targetZ = 10 - scrollY * 0.02
+        const targetY = -scrollY * 0.005
+
+        // Smooth camera flight
+        camera.position.z = THREE.MathUtils.lerp(camera.position.z, targetZ, 0.04)
+        camera.position.y = THREE.MathUtils.lerp(camera.position.y, targetY, 0.04)
+
+        // Subtle mouse parallax (look at mouse position slightly)
+        // We look at a point in front of the camera that shifts with mouse
+        const lookX = mouse.x * 2
+        const lookY = mouse.y * 1
+
+        // Smoothly interpolate the look-at target
+        // Current camera rotation is roughly 0,0,0. We just want slight tilt.
+        camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, -lookY * 0.05, 0.05)
+        camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, -lookX * 0.05, 0.05)
     })
 
-    return (
-        <group rotation={[Math.PI / 2.3, 0, 0]} position={[0, -10, -20]}>
-            <mesh ref={meshRef}>
-                <planeGeometry args={[100, 100, 40, 40]} />
-                <meshBasicMaterial color="#1e293b" wireframe transparent opacity={0.2} />
-            </mesh>
-            {/* Second grid for density */}
-            <mesh position={[0, 0, -0.1]}>
-                <planeGeometry args={[100, 100, 10, 10]} />
-                <meshBasicMaterial color="#0f172a" transparent opacity={0.5} />
-            </mesh>
-        </group>
-    )
+    return null
 }
 
-const FloatingDataParticles = ({ count = 50 }) => {
+const StarField = ({ count = 2000 }) => {
     const mesh = useRef()
 
-    // Generate random positions
     const particles = useMemo(() => {
         const temp = []
         for (let i = 0; i < count; i++) {
-            const x = (Math.random() - 0.5) * 30
-            const y = (Math.random() - 0.5) * 50 - 10 // Spread vertically
-            const z = (Math.random() - 0.5) * 20 - 5
-            const scale = Math.random()
+            const x = THREE.MathUtils.randFloatSpread(100)
+            const y = THREE.MathUtils.randFloatSpread(100)
+            const z = THREE.MathUtils.randFloatSpread(100) - 50 // Spread mostly forward/backward
+            const scale = Math.random() * 0.5 + 0.1
             temp.push({ x, y, z, scale })
         }
         return temp
     }, [count])
 
     useFrame((state) => {
-        const t = state.clock.getElapsedTime()
-        particles.forEach((p, i) => {
-            // Subtle floating motion
-            const y = p.y + Math.sin(t * 0.5 + i) * 0.5
-            const dummy = new THREE.Object3D()
-            dummy.position.set(p.x, y, p.z)
-            dummy.scale.setScalar(p.scale * 0.1) // Small particles
-            dummy.rotation.x = t * 0.2 + i
-            dummy.rotation.y = t * 0.3 + i
-            dummy.updateMatrix()
-            mesh.current.setMatrixAt(i, dummy.matrix)
-        })
-        mesh.current.instanceMatrix.needsUpdate = true
+        // Optional: Slow rotation of the entire field
+        if (mesh.current) {
+            mesh.current.rotation.z = state.clock.getElapsedTime() * 0.02
+        }
     })
 
     return (
         <instancedMesh ref={mesh} args={[null, null, count]}>
-            <octahedronGeometry args={[1, 0]} />
-            <meshBasicMaterial color="#38bdf8" wireframe transparent opacity={0.3} />
+            <sphereGeometry args={[0.1, 8, 8]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.6} />
+            {particles.map((p, i) => (
+                <Dummy key={i} p={p} />
+            ))}
         </instancedMesh>
     )
 }
 
-const HeroCluster = () => {
+const Dummy = ({ p }) => {
     const ref = useRef()
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime()
-        ref.current.rotation.y = t * 0.1
-        ref.current.rotation.z = t * 0.05
+    useFrame(() => {
+        if (ref.current) {
+            ref.current.position.set(p.x, p.y, p.z)
+            ref.current.scale.setScalar(p.scale)
+            ref.current.updateMatrix()
+        }
     })
+    return <object3D ref={ref} />
+}
 
+// Abstract Geometric Monuments
+const Monuments = () => {
     return (
-        <group ref={ref} position={[3, 2, -5]}>
-            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                {/* Abstract geometric knot */}
-                <mesh>
-                    <torusKnotGeometry args={[1, 0.3, 128, 16]} />
-                    <meshNormalMaterial transparent opacity={0.1} wireframe />
-                </mesh>
-                <mesh>
-                    <torusKnotGeometry args={[1, 0.3, 128, 16]} />
-                    {/* Glassy material look */}
-                    <meshPhysicalMaterial
-                        color="#38bdf8"
-                        roughness={0}
-                        metalness={0.5}
-                        transmission={0.5}
-                        thickness={2}
+        <>
+            {/* Hero Planet/Orb */}
+            <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.5}>
+                <mesh position={[5, 2, -5]}>
+                    <sphereGeometry args={[2, 64, 64]} />
+                    <MeshDistortMaterial
+                        color="#1e1e24"
+                        emissive="#2a2a35"
+                        emissiveIntensity={0.2}
+                        roughness={0.1}
+                        metalness={1}
+                        distort={0.3}
+                        speed={1}
                     />
                 </mesh>
             </Float>
-        </group>
+
+            {/* About Section Shards */}
+            <group position={[-5, -5, -20]}>
+                <Float speed={2} rotationIntensity={1} floatIntensity={2}>
+                    <mesh rotation={[0.5, 0.5, 0]}>
+                        <octahedronGeometry args={[3, 0]} />
+                        <meshStandardMaterial
+                            color="#38bdf8"
+                            wireframe
+                            transparent
+                            opacity={0.1}
+                        />
+                    </mesh>
+                </Float>
+                <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
+                    <mesh position={[2, 1, 1]}>
+                        <icosahedronGeometry args={[1, 0]} />
+                        <meshStandardMaterial color="#64748b" roughness={0.5} metalness={0.8} />
+                    </mesh>
+                </Float>
+            </group>
+
+            {/* Project Data Streams (Cylinders) */}
+            <group position={[8, -10, -35]}>
+                {[...Array(5)].map((_, i) => (
+                    <Float key={i} speed={0.5 + Math.random()} rotationIntensity={0.5} floatIntensity={0.2}>
+                        <mesh position={[Math.random() * 2, i * 4 - 8, Math.random() * 2]} rotation={[0, 0, Math.PI / 4]}>
+                            <cylinderGeometry args={[0.05, 0.05, 10, 8]} />
+                            <meshBasicMaterial color="#38bdf8" transparent opacity={0.3} />
+                        </mesh>
+                    </Float>
+                ))}
+            </group>
+
+            {/* Contact Portal Ring */}
+            <group position={[0, -20, -50]}>
+                <mesh rotation={[Math.PI / 2, 0, 0]}>
+                    <torusGeometry args={[8, 0.1, 16, 100]} />
+                    <meshBasicMaterial color="#ffffff" transparent opacity={0.2} />
+                </mesh>
+                <pointLight intensity={2} color="#38bdf8" distance={20} />
+            </group>
+        </>
     )
 }
 
 export const Background3D = () => {
     return (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: -1 }}>
-            <Canvas gl={{ antialias: true, alpha: true }} dpr={[1, 2]}>
-                <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
-                <ScrollCamera />
+            <Canvas
+                dpr={[1, 2]}
+                gl={{ antialias: true, alpha: false, toneMapping: THREE.ACESFilmicToneMapping }}
+            >
+                <CinematicCamera />
 
-                <color attach="background" args={['#0e0e11']} />
-                <fog attach="fog" args={['#0e0e11', 5, 30]} />
+                {/* Cinematic Lighting */}
+                <color attach="background" args={['#050505']} />
+                <fog attach="fog" args={['#050505', 0, 60]} />
 
-                <ambientLight intensity={0.2} />
-                <pointLight position={[10, 10, 10]} intensity={1} color="#38bdf8" />
-                <pointLight position={[-10, -10, 5]} intensity={0.5} color="#c084fc" />
+                <ambientLight intensity={0.1} />
+                {/* Hero Light */}
+                <spotLight position={[10, 10, 10]} angle={0.5} penumbra={1} intensity={1} color="#ffffff" />
+                {/* Rim Light */}
+                <spotLight position={[-10, 0, -5]} angle={0.5} penumbra={1} intensity={2} color="#38bdf8" />
 
-                {/* Scene Elements */}
-                <Stars radius={100} depth={50} count={3000} factor={3} saturation={0} fade speed={1} />
-                <DigitalGrid />
-                <FloatingDataParticles count={100} />
-                <HeroCluster />
+                {/* Scene Content */}
+                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={0.5} />
+                <Monuments />
 
             </Canvas>
         </div>
